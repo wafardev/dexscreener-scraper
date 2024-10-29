@@ -39,7 +39,7 @@ Dexscreener Scraper is a Node.js application that fetches the latest token profi
    For production use, consider using a process manager like PM2:
    
    ```bash
-   pm2 start src/main.js --name "solana-listener"
+   pm2 start src/main.js --name "dexscreener-scraper"
    ```
 
 3. The scraper will run and check for new token profiles every 5 minutes, saving data into the `downloaded-sites` directory.
