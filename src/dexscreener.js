@@ -1,24 +1,25 @@
-async function getLatestTokenProfile() {
+const axios = require("axios");
+
+async function getLatestTokenProfiles() {
   try {
-    const response = await fetch(
-      "https://api.dexscreener.com/token-profiles/latest/v1",
-      {
-        method: "GET",
-        headers: {},
-      }
+    console.log("Starting fetch...");
+
+    const response = await axios.get(
+      "https://api.dexscreener.com/token-profiles/latest/v1"
     );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    console.log("Fetch response received.");
 
-    const data = await response.json();
+    const data = response.data;
 
-    return data.length > 0 ? data[0] : null;
+    //console.log("Data received:", data);
+
+    return data.length > 0 ? data : null;
   } catch (error) {
-    console.error("Error fetching latest token profile:", error);
+    console.error("Error fetching latest token profiles:", error.message);
+    console.error("Full error object:", error);
     return null;
   }
 }
 
-module.exports = { getLatestTokenProfile };
+module.exports = { getLatestTokenProfiles };

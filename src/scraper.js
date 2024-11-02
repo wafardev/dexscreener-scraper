@@ -15,55 +15,94 @@ async function downloadResource(page, resourceUrl, outputDir) {
     const contentType = response.headers()["content-type"] || "";
     const parsedUrl = url.parse(resourceUrl);
 
-    let filePath;
+    // Generate a relative file path based on the resource path within the output directory
     const resourcePath = parsedUrl.pathname.replace(/^\/+/, "");
+    const filePath = path.join(outputDir, resourcePath);
+
+    // Create directories for the file path if they don’t exist
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
     if (contentType.includes("text/html")) {
-      filePath = path.join(outputDir, "index.html");
       const html = await response.text();
       fs.writeFileSync(filePath, html);
-      await crawlPage(resourceUrl, page, outputDir); // Recursively crawl internal links
+      const crawlSuccess = await crawlPage(resourceUrl, page, outputDir);
+      if (!crawlSuccess) return false;
     } else {
-      // For other resources, maintain the directory structure
-      filePath = path.join(outputDir, resourcePath);
-      fs.mkdirSync(path.dirname(filePath), { recursive: true });
-
       const buffer = await response.buffer();
       fs.writeFileSync(filePath, buffer);
     }
 
     console.log(`Downloaded: ${resourceUrl}`);
+    return true;
   } catch (err) {
     console.error(`Failed to download ${resourceUrl}:`, err);
+    return false;
   }
 }
 
 async function crawlPage(startUrl, page, outputDir) {
-  if (visitedUrls.has(startUrl)) return;
+  if (visitedUrls.has(startUrl)) return true;
   visitedUrls.add(startUrl);
 
   await page.goto(startUrl, { waitUntil: "networkidle2" });
   const html = await page.content();
+  const $ = cheerio.load(html);
 
+  // Save main HTML file
   const filePath = path.join(outputDir, "index.html");
   fs.writeFileSync(filePath, html);
 
-  const $ = cheerio.load(html);
-
-  // Download linked resources (images, scripts, styles, and favicons)
+  // Array to collect relative resource URLs
   const resourceUrls = [];
-  $('img, script, link[rel="stylesheet"], link[rel="icon"]').each(
-    (_, element) => {
-      const src = $(element).attr("src") || $(element).attr("href");
-      if (src) {
-        const absoluteUrl = new URL(src, startUrl).href;
+  $(
+    'img, script, link[rel="stylesheet"], link[rel="icon"], link[rel="preload"]'
+  ).each((_, element) => {
+    const src = $(element).attr("src") || $(element).attr("href");
+
+    if (src) {
+      // Convert absolute URLs to relative paths
+      const absoluteUrl = new URL(src, startUrl).href;
+      const relativePath = path.relative(
+        outputDir,
+        path.join(outputDir, url.parse(absoluteUrl).pathname)
+      );
+
+      // Update element attribute with relative path
+      $(element).attr("src", relativePath).attr("href", relativePath);
+
+      const extension = path.extname(relativePath).toLowerCase();
+      if (
+        [
+          ".js",
+          ".css",
+          ".jpg",
+          ".jpeg",
+          ".png",
+          ".svg",
+          ".woff",
+          ".woff2",
+          ".ttf",
+          ".otf",
+          ".eot",
+        ].includes(extension)
+      ) {
         resourceUrls.push(absoluteUrl);
       }
     }
-  );
+  });
+
+  if (resourceUrls.length > 100) {
+    console.log("Too many items to download. Abort.");
+    return false;
+  }
 
   for (const resourceUrl of resourceUrls) {
-    await downloadResource(page, resourceUrl, outputDir);
+    const downloadSuccess = await downloadResource(
+      page,
+      resourceUrl,
+      outputDir
+    );
+    if (!downloadSuccess) return false;
   }
 
   // Recursively crawl internal links
@@ -79,8 +118,11 @@ async function crawlPage(startUrl, page, outputDir) {
   });
 
   for (const pageUrl of pageUrls) {
-    await crawlPage(pageUrl, page, outputDir);
+    const crawlSuccess = await crawlPage(pageUrl, page, outputDir);
+    if (!crawlSuccess) return false;
   }
+
+  return true;
 }
 
 async function scrape(startUrl) {
@@ -95,6 +137,7 @@ async function scrape(startUrl) {
 
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: "/usr/bin/chromium-browser",
     ignoreHTTPSErrors: true,
     args: [
       "--no-sandbox",
@@ -111,7 +154,15 @@ async function scrape(startUrl) {
 
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-  await crawlPage(startUrl, page, outputDir);
+  const crawlSuccess = await crawlPage(startUrl, page, outputDir);
+
+  if (!crawlSuccess) {
+    fs.writeFileSync(
+      path.join(outputDir, "error.txt"),
+      "Too many resources to download."
+    );
+    console.log("Error encountered. Created error.txt for cleanup.");
+  }
 
   await browser.close();
 }
