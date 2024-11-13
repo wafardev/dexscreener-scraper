@@ -10,7 +10,7 @@ Dexscreener Scraper is a Node.js application that fetches the latest token profi
 - Scrapes the corresponding website for additional content.
 - Downloads token images (header and logo) and saves them locally.
 - Saves token descriptions into text files.
-- Automatically runs every 5 minutes to update token information.
+- Automatically runs every 10 minutes to update token information.
 
 ## Installation
 

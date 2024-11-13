@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node ./src/main.js"
+    "dev": "node ./src/main.js",
+    "cleanup": "node ./src/cleanup.js"
   },
   "keywords": [],
   "author": "",
