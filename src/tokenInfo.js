@@ -53,7 +53,34 @@ async function downloadHeaderAndLogo(outputDir, headerUrl, iconUrl) {
   console.log(`Saved logo image to ${iconImagePath}`);
 }
 
+async function addContractToPath(contractAddress, sourceCode, chain, safeBool) {
+  const safeText = safeBool ? "_safe" : "_unsafe";
+
+  const contractFilePath = path.join(
+    "./saved-contracts",
+    `${chain}_${contractAddress}${safeText}.txt`
+  );
+
+  const outputDir = path.dirname(contractFilePath);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  if (fs.existsSync(contractFilePath)) {
+    console.log(`File ${contractFilePath} already exists. Skipping save.`);
+    return;
+  }
+
+  try {
+    await fs.promises.writeFile(contractFilePath, sourceCode);
+    console.log(`Saved contract link to ${contractFilePath}`);
+  } catch (error) {
+    console.error(`Failed to save contract link: ${error.message}`);
+  }
+}
+
 module.exports = {
   downloadHeaderAndLogo,
   saveDescription,
+  addContractToPath,
 };

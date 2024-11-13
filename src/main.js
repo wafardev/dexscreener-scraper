@@ -1,6 +1,7 @@
 const { getLatestTokenProfiles } = require("./dexscreener");
 const { scrape } = require("./scraper");
 const { downloadHeaderAndLogo, saveDescription } = require("./tokenInfo");
+const { fetchContract } = require("./contractFetcher");
 const fs = require("fs");
 const path = require("path");
 
@@ -18,6 +19,7 @@ async function main() {
 
     for (const tokenProfile of tokenProfiles) {
       console.log("Token profile:", tokenProfile);
+      await fetchContract(tokenProfile);
       if (!tokenProfile || !tokenProfile.links) {
         console.log("No valid token profile found.");
         continue;

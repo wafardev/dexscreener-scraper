@@ -1,3 +1,5 @@
 node_modules
 downloaded-sites
+saved-contracts
 .vscode
+.env
