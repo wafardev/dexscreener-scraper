@@ -58,7 +58,7 @@ async function addContractToPath(contractAddress, sourceCode, chain, safeBool) {
 
   const contractFilePath = path.join(
     "./saved-contracts",
-    `${chain}_${contractAddress}${safeText}.txt`
+    `${chain}_${contractAddress}${safeText}.sol`
   );
 
   const outputDir = path.dirname(contractFilePath);

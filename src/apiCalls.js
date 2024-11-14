@@ -37,7 +37,7 @@ async function useTTFBotAPI(contractAddress, chain) {
     );
 
     const data = await response.json();
-    console.log(data);
+    //console.log(data);
 
     if (!data.token || data.error) {
       console.log("The contract cannot be verified by TTF API");
