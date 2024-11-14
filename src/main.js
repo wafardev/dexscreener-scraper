@@ -1,7 +1,7 @@
-const { getLatestTokenProfiles } = require("./dexscreener");
-const { scrape } = require("./scraper");
-const { downloadHeaderAndLogo, saveDescription } = require("./tokenInfo");
-const { fetchContract } = require("./contractFetcher");
+const { getLatestTokenProfiles } = require("./services/dexscreener");
+const { scrape } = require("./services/scraper");
+const { downloadHeaderAndLogo, saveDescription } = require("./api/tokenInfo");
+const { fetchContract } = require("./api/contractFetcher");
 const fs = require("fs");
 const path = require("path");
 
@@ -45,12 +45,23 @@ async function main() {
         "youtu.be",
         "youtube.com",
         "pump.fun",
+        "tiktok.com",
+        "warpcast.com",
+        "pastebin.com",
       ];
+
+      let blocked = false;
 
       for (let domain of blockedDomains) {
         if (url.includes(domain)) {
-          return;
+          blocked = true;
+          break;
         }
+      }
+
+      if (blocked) {
+        console.log("Blocked domain found in URL:", url);
+        continue;
       }
 
       const { description, header, icon } = tokenProfile;
@@ -95,6 +106,11 @@ async function main() {
         continue;
       }
     }
+
+    console.log(
+      "processTokens completed successfully at",
+      new Date().toLocaleTimeString()
+    );
   }
 
   await processTokens();

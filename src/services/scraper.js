@@ -137,7 +137,6 @@ async function scrape(startUrl) {
 
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: "/usr/bin/chromium-browser",
     ignoreHTTPSErrors: true,
     args: [
       "--no-sandbox",

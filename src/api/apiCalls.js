@@ -40,7 +40,9 @@ async function useTTFBotAPI(contractAddress, chain) {
     //console.log(data);
 
     if (!data.token || data.error) {
-      console.log("The contract cannot be verified by TTF API");
+      console.log(
+        `The contract (${contractAddress}) cannot be verified by TTF API`
+      );
       return "unverified";
     }
 
@@ -58,30 +60,36 @@ async function useTTFBotAPI(contractAddress, chain) {
     for (const warning of security) {
       if (rugList.includes(warning)) {
         if (!renouncedList.includes(warning)) {
-          console.log("The contract is probably a scam (no renounce)");
+          console.log(
+            `The contract (${contractAddress}) is probably a scam (no renounce)`
+          );
           return false;
         }
       } else if (warning.includes("are external contracts")) {
         console.log(
-          "The contract is probably a scam due to external contracts"
+          `The contract (${contractAddress}) is probably a scam due to external contracts`
         );
         return false;
       } else if (warning.includes("FUNCTIONS:")) {
         if (!safeFunctions.some((func) => warning.includes(func))) {
-          console.log("The contract is probably a scam (unsafe functions)");
+          console.log(
+            `The contract (${contractAddress}) is probably a scam (unsafe functions)`
+          );
           return false;
         }
       } else if (
         warning.includes("Honeypot") ||
         warning.includes("BE CAREFUL")
       ) {
-        console.log("The contract is probably a scam");
+        console.log(`The contract (${contractAddress}) is probably a scam`);
         return false;
       }
     }
 
     if (honeyPot) {
-      console.log("The contract is identified as a honeypot");
+      console.log(
+        `The contract (${contractAddress}) is identified as a honeypot`
+      );
       return false;
     }
 

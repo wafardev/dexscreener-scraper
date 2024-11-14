@@ -2,7 +2,7 @@ const { useTTFBotAPI, getSourceCode } = require("./apiCalls");
 const { addContractToPath } = require("./tokenInfo");
 
 async function fetchContract(tokenProfile) {
-  console.log("Fetching contract for token profile:", tokenProfile);
+  //console.log("Fetching contract for token profile:", tokenProfile);
 
   const supportedChains = ["ethereum", "base"];
 
