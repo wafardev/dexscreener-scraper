@@ -2,7 +2,7 @@
 
 ## Overview
 
-Dexscreener Scraper is a Node.js application that fetches the latest token profiles from the Dexscreener API, scrapes their associated websites, and saves relevant information such as descriptions, header images, and logos to a local directory structure.
+Dexscreener Scraper is a Node.js application that fetches the latest token profiles from the Dexscreener API, scrapes their associated websites, and saves relevant information such as descriptions, header images, logos, and contracts to a local directory structure.
 
 ## Features
 
@@ -10,6 +10,7 @@ Dexscreener Scraper is a Node.js application that fetches the latest token profi
 - Scrapes the corresponding website for additional content.
 - Downloads token images (header and logo) and saves them locally.
 - Saves token descriptions into text files.
+- Saves Ethereum and Base contracts if they are "safe" to use (DYOR).
 - Automatically runs every 10 minutes to update token information.
 
 ## Installation
@@ -27,6 +28,13 @@ Dexscreener Scraper is a Node.js application that fetches the latest token profi
    npm install
    ```
 
+3. Save your API Keys for Etherscan and TTF Bot in a new `.env` file:
+
+   ```bash
+   ETHERSCAN_API_KEY=etherscan_api_key
+   TTF_API_TOKEN=ttf_api_token
+   ```
+
 ## Usage
 
 1. Ensure you have Node.js installed (version 14 or higher recommended).
@@ -42,7 +50,13 @@ Dexscreener Scraper is a Node.js application that fetches the latest token profi
    pm2 start src/main.js --name "dexscreener-scraper"
    ```
 
-3. The scraper will run and check for new token profiles every 5 minutes, saving data into the `downloaded-sites` directory.
+3. The scraper will run and check for new token profiles every 10 minutes, saving data into the `downloaded-sites` directory and saved contracts into the `saved-contracts` directory.
+
+4. Cleanup any website containing errors and unsafe contracts using:
+
+   ```bash
+   npm run cleanup
+   ```
 
 ## Directory Structure
 
@@ -56,6 +70,9 @@ downloaded-sites/
         ├── description.txt
         ├── header.png
         └── logo.png
+
+saved-contracts/
+└──  <chain-name>_<contract-address>_<safe-or-not-safe>.sol/
 ```
 
 ## Functions
@@ -64,6 +81,7 @@ downloaded-sites/
 - `scrape(url)`: Scrapes the specified URL and downloads the HTML content and resources.
 - `downloadHeaderAndLogo(outputDir, headerUrl, iconUrl)`: Downloads the header image and logo into the specified directory.
 - `saveDescription(outputDir, description)`: Saves the token description into a text file.
+- `fetchContract(tokenProfile)`: Fetches source code from Etherscan and runs the code through a static analysis tool for vulnerabilities.
 
 ## Error Handling
 
@@ -78,3 +96,5 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 - [Dexscreener](https://dexscreener.com) for providing the API.
 - [Node.js](https://nodejs.org) for enabling easy JavaScript server-side development.
 - [Puppeteer](https://pptr.dev/) for web scraping capabilities.
+- [Etherscan](https://etherscan.io/) for providing blockchain data.
+- [TTF Bot](https://ttfbot.io/) for their static analysis tool.
