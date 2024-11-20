@@ -3,3 +3,4 @@ downloaded-sites
 saved-contracts
 .vscode
 .env
+.DS_Store
