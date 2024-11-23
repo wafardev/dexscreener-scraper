@@ -4,9 +4,10 @@ const { downloadHeaderAndLogo, saveDescription } = require("./api/tokenInfo");
 const { fetchContract } = require("./api/contractFetcher");
 const fs = require("fs");
 const path = require("path");
-const pLimit = require("p-limit");
 
 async function main(limitFlag) {
+  const pLimit = await import("p-limit").then((mod) => mod.default);
+
   async function processTokens(usePLimit) {
     let tokenProfiles;
     try {
