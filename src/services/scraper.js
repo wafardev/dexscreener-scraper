@@ -136,6 +136,8 @@ async function scrape(startUrl) {
   }
 
   const browser = await puppeteer.launch({
+    // uncomment the following line if you want to use a custom path to the Chromium executable
+    // executablePath: "/usr/bin/chromium-browser",
     headless: true,
     ignoreHTTPSErrors: true,
     args: [
