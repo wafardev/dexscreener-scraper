@@ -53,12 +53,10 @@ async function downloadHeaderAndLogo(outputDir, headerUrl, iconUrl) {
   console.log(`Saved logo image to ${iconImagePath}`);
 }
 
-async function addContractToPath(contractAddress, sourceCode, chain, safeBool) {
-  const safeText = safeBool ? "_safe" : "_unsafe";
-
+async function addContractToPath(contractAddress, sourceCode) {
   const contractFilePath = path.join(
     "./saved-contracts",
-    `${chain}_${contractAddress}${safeText}.sol`
+    `${contractAddress}.sol`
   );
 
   const outputDir = path.dirname(contractFilePath);
