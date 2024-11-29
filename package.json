@@ -10,7 +10,7 @@
     "logs": "pm2 logs 'dexscreener-scraper'",
     "restart": "pm2 restart 'dexscreener-scraper'",
     "delete": "pm2 delete 'dexscreener-scraper'",
-    "cleanup": "node ./src/utils/cleanUp.js ./downloaded-sites ./saved-contracts"
+    "cleanup": "bash ./src/utils/cleanUp.sh"
   },
   "keywords": [],
   "author": "",

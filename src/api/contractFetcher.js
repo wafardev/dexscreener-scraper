@@ -28,10 +28,12 @@ async function fetchContract(tokenProfile) {
     return;
   }
 
+  const safeBool = response == true;
+
   const sourceCode = await getSourceCode(tokenAddress, chainId);
 
   try {
-    await addContractToPath(tokenAddress, sourceCode);
+    await addContractToPath(tokenAddress, sourceCode, chainId, safeBool);
   } catch (error) {
     console.error("Error saving contract link:", error);
   }
